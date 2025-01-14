@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, globalShortcut } = require('electron');
+const { app, BrowserWindow, screen, globalShortcut, ipcMain } = require('electron');
 const { io } = require('socket.io-client');
 const path = require('path');
 
@@ -46,7 +46,7 @@ socket.on('unblock', () => {
 
 socket.on('updateTask', (task) => {
   if (mainWindow) {
-    mainWindow.webContents.send('updateTask', task);
+    mainWindow.webContents.send('taskUpdate', task);
   }
 });
 
@@ -58,6 +58,6 @@ socket.on('initialState', (state) => {
     } else {
       mainWindow.hide();
     }
-    mainWindow.webContents.send('updateTask', state.currentTask);
+    mainWindow.webContents.send('taskUpdate', state.currentTask);
   }
 });
