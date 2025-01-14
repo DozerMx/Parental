@@ -1,9 +1,9 @@
-import { app, BrowserWindow, screen, globalShortcut } from 'electron';
-import { io } from 'socket.io-client';
-import path from 'path';
+const { app, BrowserWindow, screen, globalShortcut } = require('electron');
+const { io } = require('socket.io-client');
+const path = require('path');
 
 let mainWindow;
-const socket = io('http://localhost:3000');
+const socket = io('http://192.168.1.88:3000');
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -15,16 +15,14 @@ function createWindow() {
     alwaysOnTop: true,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
+      webSecurity: false
     }
   });
 
   mainWindow.loadFile('index.html');
-  
-  // Deshabilitar Alt+F4
   mainWindow.setClosable(false);
   
-  // Bloquear todas las combinaciones de teclas comunes
   globalShortcut.register('Alt+Tab', () => {});
   globalShortcut.register('Alt+F4', () => {});
   globalShortcut.register('CommandOrControl+W', () => {});
@@ -33,7 +31,6 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-// Manejar eventos del servidor
 socket.on('block', () => {
   if (mainWindow) {
     mainWindow.show();
@@ -47,8 +44,20 @@ socket.on('unblock', () => {
   }
 });
 
-socket.on('task', (task) => {
+socket.on('updateTask', (task) => {
   if (mainWindow) {
     mainWindow.webContents.send('updateTask', task);
+  }
+});
+
+socket.on('initialState', (state) => {
+  if (mainWindow) {
+    if (state.isBlocked) {
+      mainWindow.show();
+      mainWindow.setAlwaysOnTop(true, 'screen-saver');
+    } else {
+      mainWindow.hide();
+    }
+    mainWindow.webContents.send('updateTask', state.currentTask);
   }
 });
