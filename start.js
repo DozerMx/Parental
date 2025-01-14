@@ -1,14 +1,4 @@
-const { spawn } = require('child_process');
-const path = require('path');
+const { exec } = require('child_process');
 
-function startApp() {
-    const electronProcess = spawn('electron', ['.'], {
-        detached: true,
-        stdio: 'ignore',
-        windowsHide: true
-    });
-    
-    electronProcess.unref();
-}
-
-startApp();
+// Solo iniciar la aplicación Electron
+exec('start cmd /c electron .', { windowsHide: true });
