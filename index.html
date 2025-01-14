@@ -56,10 +56,16 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io('http://localhost:3000');
+    const socket = io('http://192.168.1.88:3000');
     
     socket.on('updateTask', (task) => {
-      document.getElementById('currentTask').textContent = task;
+      document.getElementById('currentTask').textContent = task || 'No hay tareas asignadas';
+    });
+
+    socket.on('initialState', (state) => {
+      if (state.currentTask) {
+        document.getElementById('currentTask').textContent = state.currentTask;
+      }
     });
   </script>
 </body>
